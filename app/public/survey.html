@@ -35,7 +35,7 @@
       <div class="modal-body">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default modalClear" data-dismiss="modal">Close</button>
       </div>
     </div>
 
@@ -137,6 +137,9 @@
             })
         })
         $(".footer").append(submitButton)
+        $(".modalClear").click(event=>{
+        	$(".modal-body").empty()
+        })
     })
     </script>
 </body>
