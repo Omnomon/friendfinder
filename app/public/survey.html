@@ -121,7 +121,11 @@
                 }
 
 
-                $("#myModal").modal()
+                $("#myModal").modal().then(function(event){
+        			$(".modal-body").empty()
+                }).catch(function(catch){
+        			$(".modal-body").empty()
+                })
 
 
             })
