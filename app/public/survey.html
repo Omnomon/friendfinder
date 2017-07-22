@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>survey</title>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!-- <script type="text/javascript" src="../data/friends.js"></script> -->
+</head>
+
+<body>
+    <div class="body">
+        <div class="header jumbotron">SURVEY</div>
+        <div class="personalInfo"></div>
+        <div class="top col-xs-12">
+        </div>
+        <div class="footer col-xs-6">
+        </div>
+        <div class="col-xs-6">
+        	<a href="/">Click here to retake the survey...you may or may not be your own best match</a>
+        </div>
+    </div>
+
+    <!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Your Top 3 matches!</h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <script type="text/javascript">
+    $(document).ready(() => {
+        //name and other info
+        const personalInfo = $("<div>").addClass("form-group row")
+        let lable = $("<label>").addClass("col-xs-1 col-form-label").text("Name").appendTo(personalInfo)
+        let personalInfoContainer = $("<div>").addClass("col-xs-2").append(
+            $("<input>").addClass("form-control").attr("id", "userName").attr("placeholder", "name")
+        ).appendTo(personalInfo);
+        $(".personalInfo").append(personalInfo)
+
+
+        //Dropdown numbers for each question 
+        const questions = ["On a scale from 1 to 10, how much do you like pets?", "On a scale from 1 to 10, how much do you like ice cream?", "On a scale from 1 to 10, how much do you like bacon?", "On a scale from 1 to 10, how much do you like TV?", "On a scale from 1 to 10, how much do you like apples", "On a scale from 1 to 10, how much do you like school?", "On a scale from 1 to 10, how much do you like video games?", "On a scale from 1 to 10, how much do you like beer?", "On a scale from 1 to 10, how much do you like sports?", "On a scale from 1 to 10, how much do you like going out to the clubs?"]
+
+        //create 10 questions 
+        for (let i = 0; i < 10; i++) {
+            let onAScaleOfOneToTen = $("<div>").addClass("form-group").attr("id", `options_${i}`)
+            let onAScaleOfOneToTenContainer = $("<label>").attr("for", `options_${i}`).html(questions[i]).appendTo(onAScaleOfOneToTen)
+            let optionsList = $("<select>").addClass("form-control").appendTo(onAScaleOfOneToTenContainer)
+            for (let j = 1; j < 11; j++) {
+                var option = $("<option>")
+                    .text(j)
+                    .appendTo(optionsList)
+            }
+            $(".top").append(onAScaleOfOneToTen)
+
+        }
+
+        //create submit button
+        const submitButton = $("<button>").text("Submit").attr("type", "submit").attr("formmethod", "post").attr("formaction", "./api/:friends?").click(event => {
+            event.preventDefault()
+            console.log("post info")
+            let name = $("#userName").val().trim()
+            let surveyAnswers = [];
+            for (let i = 0; i < 10; i++) {
+                let value = $(`#options_${i} option:selected`).val()
+                surveyAnswers.push(value)
+            }
+            let entry = {
+                name: name,
+                score: surveyAnswers,
+                img: "http://lorempixel.com/200/200/"
+            }
+
+            console.log(entry)
+
+
+            $.get("/api/friends", (data) => {
+                let differences = []
+                for (let i = 0; i < data.length; i++) {
+           			let differenceArray = [];	
+	                for (let j = 0; j < data[i].score.length; j++) {
+	                    let difference = Math.abs(parseInt(entry.score[j]) - parseInt(data[i].score[j]))
+	                    differenceArray.push(difference)
+               		}
+               		let totalDifference = differenceArray.reduce((acc, curr)=>{
+               			return acc + curr
+               		})
+
+                    let match = { name: data[i].name, difference: differenceArray, totalDifference: totalDifference, img: data[i].img }
+                    differences.push(match)
+                }
+                console.log(differences)
+
+                differences.sort(function(a, b){
+                	return a.totalDifference - b.totalDifference; 
+                })
+
+                console.log(differences)
+                console.log(differences[0].img)
+
+
+                for (i = 0; i < 3; i ++){
+	                $("<p>").text("Name:" + differences[i].name).appendTo($(".modal-body"))
+	                $("<img>").attr("src", differences[i].img).appendTo($(".modal-body"))
+	                $("<p>").text("Total Difference:" + differences[i].totalDifference).appendTo($(".modal-body"))
+                }
+
+
+                $("#myModal").modal()
+
+
+            })
+
+            let currentUrl = window.location.origin;
+
+            $.post(`${currentUrl}/api/friends`, entry, data => {
+                if (data) {
+                    console.log("posted to server")
+                } else {
+                    console.log("post did not work")
+                }
+            })
+        })
+        $(".footer").append(submitButton)
+    })
+    </script>
+</body>
+
+</html>

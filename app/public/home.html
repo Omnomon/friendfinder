@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>home</title>
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<!-- 	<script type="text/javascript" src="../data/friends.js"></script> -->
+
+</head>
+<body>
+<div class="body">
+	<div class=" col-xs-12 header jumbotron">Home page</div>
+	<div class="Top">
+		<div>
+			<h1>SOME KIND OF SURVEY</h1>
+			<h1>INSERT FANCY PICTURE HERE</h1>
+		</div>
+		<div><a href="survey">Click here to go to the survey</a></div>
+		<div></div>
+	</div>
+	<div class="footer"></div>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(()=>{
+		function listFriends(){
+			let currentUrl = window.location.origin
+			$.ajax({
+				url: `${currentUrl}/api/friends`,
+				method: "GET"
+			}).done(response=>{
+				console.log(`URL: ${currentUrl}/api/friends`)
+				console.log(response)
+			})
+
+		}
+		listFriends()
+	})
+
+</script>
+</body>
+</html>
